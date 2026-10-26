@@ -1,0 +1,57 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+[[mods]]
+
+modId="${mod_id}"
+
+version="${mod_version}"
+
+displayName="${mod_name}"
+
+authors="${mod_authors}"
+
+# 说明文本直接写在这里（不要放进 gradle.properties：那里被 Gradle 以 ISO-8859-1 读取，中文会乱码）。
+description='''远古遗迹（Ancient Remnants）与机械动力（Create）的附属模组：在两者的机制之间搭建联动内容。'''
+
+[[dependencies.${mod_id}]]
+    modId="forge"
+    mandatory=true
+    versionRange="${forge_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# 机械动力：本 mod 的内容建立在它的机器与配方体系之上，属于硬依赖。
+# AFTER 让 Create 先完成注册，避免在它的注册表还没就绪时读到半成品。
+[[dependencies.${mod_id}]]
+    modId="create"
+    mandatory=true
+    versionRange="${create_version_range}"
+    ordering="AFTER"
+    side="BOTH"
+
+# 远古遗迹：另一个上游，本 mod 直接引用它的类（缺了会 NoClassDefFoundError），因此 mandatory=true。
+# 它自己硬依赖框架 Fragmentum，版本范围由它的 mods.toml 声明，这里不必重复。
+[[dependencies.${mod_id}]]
+    modId="ancient_remnants"
+    mandatory=true
+    versionRange="${ancient_remnants_version_range}"
+    ordering="AFTER"
+    side="BOTH"
+
+# JEI：只是可选兼容（装了就能查本 mod 的配方，没装不影响主功能），
+# 因此 mandatory=false；side=CLIENT 因为 JEI 本身只在客户端有意义。
+[[dependencies.${mod_id}]]
+    modId="jei"
+    mandatory=false
+    versionRange="*"
+    ordering="NONE"
+    side="CLIENT"
