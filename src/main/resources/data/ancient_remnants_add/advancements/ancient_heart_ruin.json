@@ -1,0 +1,41 @@
+{
+  "display": {
+    "icon": {
+      "item": "ancient_remnants_add:ancient_heart"
+    },
+    "title": {
+      "translate": "advancements.ancient_remnants_add.ancient_heart_ruin.title"
+    },
+    "description": {
+      "translate": "advancements.ancient_remnants_add.ancient_heart_ruin.description"
+    },
+    "frame": "task",
+    "background": "minecraft:textures/block/deepslate_tiles.png",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "discover_altar": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "structure": "ancient_remnants_add:ancient_heart_ruin"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "discover_altar"
+    ]
+  ]
+}

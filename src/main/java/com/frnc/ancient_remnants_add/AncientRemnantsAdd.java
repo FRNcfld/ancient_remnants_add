@@ -2,6 +2,7 @@ package com.frnc.ancient_remnants_add;
 
 import com.frnc.ancient_remnants_add.altar.AltarRegistry;
 import com.frnc.ancient_remnants_add.blessing.BlessingTuning;
+import com.frnc.ancient_remnants_add.worldgen.WorldgenRegistry;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
@@ -24,8 +25,9 @@ import org.slf4j.Logger;
  *   <li>多祝福：玩家可同时持有最多 {@code maxBlessings}（默认 6）个祝福，满额时替换最早获得的；</li>
  *   <li>祝福数值：六个祝福的伤害/距离/概率/阈值等数值都可在 {@code [blessings]} 配置段调整；</li>
  *   <li>掠夺者前哨站残片：补上 Forge 端缺失的战利品表接入，与 Fabric 行为一致；</li>
- *   <li>巨石祭坛：古城战利品、集齐典籍后获得「远古回响」挑战进度、放置完整典籍后
- *       把丰收祝福扩展到整个维度；</li>
+ *   <li>远古之心：2×2×1 多方块，古城战利品、集齐典籍后获得「远古回响」挑战进度、
+ *       放置完整典籍后把丰收祝福扩展到整个维度；</li>
+ *   <li>残缺祭坛：远古遗迹周围 8–32 区块、每座遗迹 5% 概率生成；</li>
  *   <li>Create 联动：祭坛激活的维度内，Create 概率配方产出的 chance ×1.5（封顶 100%）。</li>
  * </ul>
  *
@@ -77,8 +79,11 @@ public class AncientRemnantsAdd {
 
         modEventBus.addListener(this::commonSetup);
 
-        // 巨石祭坛的方块 / 物品 / BlockEntity
+        // 远古之心的方块 / 物品 / BlockEntity
         AltarRegistry.register(modEventBus);
+
+        // 残缺祭坛的结构类型 / 放置方式 / 结构片段
+        WorldgenRegistry.register(modEventBus);
 
         // 游戏事件总线：后续的事件处理类在这里注册自己，或者直接在本类加 @SubscribeEvent 方法
         MinecraftForge.EVENT_BUS.register(this);

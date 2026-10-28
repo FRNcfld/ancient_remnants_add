@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 /**
  * Create 概率产出 +50% 的上下文。
  *
- * <p>Create 的加工机器没有玩家上下文，所以这里以「该维度是否有激活的巨石祭坛」
+ * <p>Create 的加工机器没有玩家上下文，所以这里以「该维度是否有激活的远古之心」
  * 作为触发条件：在祭坛激活的维度里，所有经过 {@code ProcessingOutput.rollOutput}
  * 的概率产出都把概率乘以 1.5（封顶 100%）。
  *

@@ -1,0 +1,7 @@
+{
+  "type": "ancient_remnants_add:ancient_heart_ruin",
+  "biomes": "#ancient_remnants_add:has_structure/ancient_heart_ruin",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin"
+}

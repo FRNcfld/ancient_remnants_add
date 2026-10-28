@@ -1,0 +1,28 @@
+{
+  "parent": "ancient_remnants_add:ancient_heart_ruin",
+  "display": {
+    "icon": {
+      "item": "ancient_remnants:monolith_codex"
+    },
+    "title": {
+      "translate": "advancements.ancient_remnants_add.glory_reborn.title"
+    },
+    "description": {
+      "translate": "advancements.ancient_remnants_add.glory_reborn.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "awaken_altar": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "awaken_altar"
+    ]
+  ]
+}

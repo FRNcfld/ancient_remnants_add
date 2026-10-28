@@ -19,6 +19,6 @@ public final class AltarClientEvents {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(AltarRegistry.MONOLITH_ALTAR_BE.get(), MonolithAltarRenderer::new);
+        event.registerBlockEntityRenderer(AltarRegistry.ANCIENT_HEART_BE.get(), AncientHeartRenderer::new);
     }
 }

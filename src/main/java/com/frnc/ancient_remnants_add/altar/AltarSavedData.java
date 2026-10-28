@@ -1,31 +1,36 @@
 package com.frnc.ancient_remnants_add.altar;
 
-import com.frnc.ancient_remnants_add.AncientRemnantsAdd;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.LongTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.saveddata.SavedData;
 
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * 每个维度一份的活动祭坛位置表。
+ * 每个维度一份的祭坛站点表。
  *
- * <p>祭坛效果是维度级的，不能只依赖区块加载：区块卸载后祭坛仍然存在。这里把激活的
- * 祭坛位置写入世界存档，作物掉落检查只关心该维度是否有任意活动祭坛。
+ * <p>站点以远古之心 ROOT 为主键；记录「是否修复、是否激活、激活时消耗的典籍」。
+ * 站点由结构生成时的 {@code afterPlace} 登记（服务端主线程），或由玩家放置远古之心时的
+ * fallback 补登记；即使远古之心被破坏/献祭销毁，站点记录也保留，允许重新修复和激活。
+ *
+ * <p>所有变更都必须在服务端主线程执行；区块生成线程（{@code Structure.afterPlace}）需要先
+ * {@code server.execute(...)} 再调用这里。
  */
 public final class AltarSavedData extends SavedData {
 
-    private static final String DATA_NAME = "ancient_remnants_add_altars";
-    private static final String ALTARS_TAG = "Altars";
+    private static final String DATA_NAME = "ancient_remnants_add_altar_sites";
+    private static final String SITES_TAG = "Sites";
 
-    private final Set<BlockPos> activeAltars = new HashSet<>();
+    private final Map<BlockPos, SiteRecord> sites = new HashMap<>();
+    /** 热路径索引：只遍历激活站点；与 sites 中的 active 同步维护。 */
+    private final Set<BlockPos> activeRoots = new HashSet<>();
 
     private AltarSavedData() {
     }
@@ -36,11 +41,14 @@ public final class AltarSavedData extends SavedData {
 
     public static AltarSavedData load(CompoundTag tag) {
         AltarSavedData data = new AltarSavedData();
-        ListTag list = tag.getList(ALTARS_TAG, Tag.TAG_LONG);
+        ListTag list = tag.getList(SITES_TAG, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
-            Tag element = list.get(i);
-            if (element instanceof LongTag longTag) {
-                data.activeAltars.add(BlockPos.of(longTag.getAsLong()));
+            SiteRecord site = SiteRecord.load(list.getCompound(i));
+            if (site != null) {
+                data.sites.put(site.root(), site);
+                if (site.active()) {
+                    data.activeRoots.add(site.root());
+                }
             }
         }
         return data;
@@ -49,64 +57,179 @@ public final class AltarSavedData extends SavedData {
     @Override
     public CompoundTag save(CompoundTag tag) {
         ListTag list = new ListTag();
-        for (BlockPos pos : activeAltars) {
-            list.add(LongTag.valueOf(pos.asLong()));
+        for (SiteRecord site : sites.values()) {
+            list.add(site.save());
         }
-        tag.put(ALTARS_TAG, list);
+        tag.put(SITES_TAG, list);
         return tag;
     }
 
-    /**
-     * 该维度里是否还有仍然有效的激活祭坛。
-     *
-     * <p>不能只判断集合非空：存档里可能残留已经不存在的祭坛位置（崩溃、别的模组直接改方块、
-     * 存档回滚），那样会让整个维度永久获得作物双掉落与 Create 概率加成，而清理入口只有
-     * 右键取回和方块被移除两条。所以这里逐条校验：区块已加载时要求该位置仍然是激活的
-     * 巨石祭坛，否则删掉这条记录；区块未加载时无法判断，按仍然有效处理
-     * （方块实体重新加载时会由 {@code setLevel} 再登记一次）。
-     */
-    public boolean isActive(ServerLevel level) {
-        if (activeAltars.isEmpty()) {
+    /** 结构生成时登记一个站点；幂等。 */
+    public void registerSite(BlockPos root) {
+        if (sites.containsKey(root)) {
+            return;
+        }
+        sites.put(root.immutable(), new SiteRecord(root.immutable()));
+        setDirty();
+    }
+
+    /** 玩家把 2×2 远古之心放进站点后标记为已修复。 */
+    public boolean markRepaired(BlockPos root) {
+        SiteRecord site = sites.get(root);
+        if (site == null) {
             return false;
         }
-        boolean active = false;
+        if (!site.repaired) {
+            site.repaired = true;
+            setDirty();
+        }
+        return true;
+    }
+
+    /** 激活站点并保存消耗的典籍；要求已修复且未激活。 */
+    public boolean activate(BlockPos root, ItemStack codex) {
+        SiteRecord site = sites.get(root);
+        if (site == null || !site.repaired || site.active) {
+            return false;
+        }
+        site.active = true;
+        site.codex = codex.copyWithCount(1);
+        activeRoots.add(root);
+        setDirty();
+        return true;
+    }
+
+    /**
+     * 熄灭站点：清除激活/修复状态并返回保存的典籍（调用方负责掉落）。
+     * 站点记录本身保留，玩家可以重新放远古之心再次激活。
+     */
+    public ItemStack extinguish(BlockPos root) {
+        SiteRecord site = sites.get(root);
+        if (site == null) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack codex = site.codex.copy();
         boolean changed = false;
-        Iterator<BlockPos> iterator = activeAltars.iterator();
-        while (iterator.hasNext()) {
-            BlockPos pos = iterator.next();
-            if (!level.isLoaded(pos)) {
-                active = true;
-                continue;
-            }
-            BlockState state = level.getBlockState(pos);
-            if (state.getBlock() == AltarRegistry.MONOLITH_ALTAR.get()
-                    && state.getValue(MonolithAltarBlock.ACTIVE)) {
-                active = true;
-            } else {
-                iterator.remove();
-                changed = true;
-                AncientRemnantsAdd.debug("丢弃失效的祭坛记录: {}", pos.toShortString());
-            }
+        if (site.active) {
+            site.active = false;
+            activeRoots.remove(root);
+            changed = true;
+        }
+        if (site.repaired) {
+            site.repaired = false;
+            changed = true;
+        }
+        if (!site.codex.isEmpty()) {
+            site.codex = ItemStack.EMPTY;
+            changed = true;
         }
         if (changed) {
             setDirty();
         }
-        return active;
+        return codex;
     }
 
-    public void add(BlockPos pos) {
-        if (activeAltars.add(pos)) {
-            setDirty();
+    public SiteRecord findSiteAt(BlockPos pos) {
+        for (SiteRecord site : sites.values()) {
+            if (site.contains(pos)) {
+                return site;
+            }
         }
+        return null;
     }
 
-    public void remove(BlockPos pos) {
-        if (activeAltars.remove(pos)) {
-            setDirty();
+    public SiteRecord findRepairableSiteAt(BlockPos pos) {
+        SiteRecord site = findSiteAt(pos);
+        return site != null && site.repaired && !site.active ? site : null;
+    }
+
+    public SiteRecord findActiveSiteAt(BlockPos pos) {
+        for (BlockPos root : activeRoots) {
+            if (AltarGeometry.areaContains(root, pos)) {
+                return sites.get(root);
+            }
         }
+        return null;
     }
 
-    public boolean contains(BlockPos pos) {
-        return activeAltars.contains(pos);
+    /** 激活祭坛覆盖的 32×25×32 范围不可破坏。 */
+    public boolean isProtected(BlockPos pos) {
+        for (BlockPos root : activeRoots) {
+            if (AltarGeometry.areaContains(root, pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasActiveSite() {
+        return !activeRoots.isEmpty();
+    }
+
+    /** 维度里是否有任意激活祭坛；供作物双掉与 Create 概率加成复用。 */
+    public boolean isActive(ServerLevel level) {
+        return hasActiveSite();
+    }
+
+    /** 单个站点的持久化状态。 */
+    public static final class SiteRecord {
+
+        private static final String ROOT_TAG = "Root";
+        private static final String REPAIRED_TAG = "Repaired";
+        private static final String ACTIVE_TAG = "Active";
+        private static final String CODEX_TAG = "Codex";
+
+        private final BlockPos root;
+        private boolean repaired;
+        private boolean active;
+        private ItemStack codex = ItemStack.EMPTY;
+
+        private SiteRecord(BlockPos root) {
+            this.root = root;
+        }
+
+        public BlockPos root() {
+            return root;
+        }
+
+        public boolean repaired() {
+            return repaired;
+        }
+
+        public boolean active() {
+            return active;
+        }
+
+        public ItemStack codex() {
+            return codex.copy();
+        }
+
+        public boolean contains(BlockPos pos) {
+            return AltarGeometry.areaContains(root, pos);
+        }
+
+        private CompoundTag save() {
+            CompoundTag tag = new CompoundTag();
+            tag.putLong(ROOT_TAG, root.asLong());
+            tag.putBoolean(REPAIRED_TAG, repaired);
+            tag.putBoolean(ACTIVE_TAG, active);
+            if (!codex.isEmpty()) {
+                tag.put(CODEX_TAG, codex.save(new CompoundTag()));
+            }
+            return tag;
+        }
+
+        private static SiteRecord load(CompoundTag tag) {
+            if (!tag.contains(ROOT_TAG, Tag.TAG_LONG)) {
+                return null;
+            }
+            SiteRecord site = new SiteRecord(BlockPos.of(tag.getLong(ROOT_TAG)));
+            site.repaired = tag.getBoolean(REPAIRED_TAG);
+            site.active = tag.getBoolean(ACTIVE_TAG);
+            if (tag.contains(CODEX_TAG, Tag.TAG_COMPOUND)) {
+                site.codex = ItemStack.of(tag.getCompound(CODEX_TAG));
+            }
+            return site;
+        }
     }
 }

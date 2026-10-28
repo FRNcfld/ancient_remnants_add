@@ -10,7 +10,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-/** 巨石祭坛的方块、物品与 BlockEntity 注册。 */
+/** 远古之心的方块、物品与 BlockEntity 注册。 */
 public final class AltarRegistry {
 
     public static final DeferredRegister<Block> BLOCKS =
@@ -20,24 +20,24 @@ public final class AltarRegistry {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, AncientRemnantsAdd.MOD_ID);
 
-    public static final RegistryObject<Block> MONOLITH_ALTAR =
-            BLOCKS.register("monolith_altar", MonolithAltarBlock::new);
+    public static final RegistryObject<Block> ANCIENT_HEART =
+            BLOCKS.register("ancient_heart", AncientHeartBlock::new);
 
-    public static final RegistryObject<Item> MONOLITH_ALTAR_ITEM =
-            ITEMS.register("monolith_altar",
-                    () -> new BlockItem(MONOLITH_ALTAR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ANCIENT_HEART_ITEM =
+            ITEMS.register("ancient_heart",
+                    () -> new BlockItem(ANCIENT_HEART.get(), new Item.Properties()));
 
-    public static final RegistryObject<BlockEntityType<MonolithAltarBlockEntity>> MONOLITH_ALTAR_BE =
-            BLOCK_ENTITIES.register("monolith_altar", () -> BlockEntityType.Builder
-                    .of(MonolithAltarBlockEntity::new, MONOLITH_ALTAR.get())
+    public static final RegistryObject<BlockEntityType<AncientHeartBlockEntity>> ANCIENT_HEART_BE =
+            BLOCK_ENTITIES.register("ancient_heart", () -> BlockEntityType.Builder
+                    .of(AncientHeartBlockEntity::new, ANCIENT_HEART.get())
                     .build(null));
 
     private AltarRegistry() {
     }
 
-    public static void register(IEventBus modEventBus) {
-        BLOCKS.register(modEventBus);
-        ITEMS.register(modEventBus);
-        BLOCK_ENTITIES.register(modEventBus);
+    public static void register(IEventBus eventBus) {
+        BLOCKS.register(eventBus);
+        ITEMS.register(eventBus);
+        BLOCK_ENTITIES.register(eventBus);
     }
 }

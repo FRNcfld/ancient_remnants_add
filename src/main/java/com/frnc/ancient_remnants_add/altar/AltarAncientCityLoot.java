@@ -8,7 +8,7 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/** 把巨石祭坛加入古城箱子的战利品表。 */
+/** 把远古之心加入古城箱子的战利品表。 */
 @Mod.EventBusSubscriber(modid = AncientRemnantsAdd.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class AltarAncientCityLoot {
 
@@ -18,7 +18,7 @@ public final class AltarAncientCityLoot {
             new ResourceLocation("minecraft", "chests/ancient_city_ice_box");
 
     private static final ResourceLocation EXTENSION =
-            new ResourceLocation(AncientRemnantsAdd.MOD_ID, "injections/ancient_city_altar");
+            new ResourceLocation(AncientRemnantsAdd.MOD_ID, "injections/ancient_city_ancient_heart");
 
     private AltarAncientCityLoot() {
     }

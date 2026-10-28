@@ -1,11 +1,14 @@
 {
-  "block.ancient_remnants_add.monolith_altar": "巨石祭坛",
+  "block.ancient_remnants_add.ancient_heart": "远古之心",
   "advancements.ancient_remnants_add.ancient_echo.title": "远古回响",
   "advancements.ancient_remnants_add.ancient_echo.description": "集齐全部研究条目，完成巨石典籍。",
-  "message.ancient_remnants_add.altar.incomplete": "祭坛需要一本已解锁全部研究条目的巨石典籍。",
-  "message.ancient_remnants_add.altar.no_advancement": "远古回响尚未回应。",
-  "message.ancient_remnants_add.altar.activated": "巨石祭坛已激活。",
-  "message.ancient_remnants_add.altar.deactivated": "巨石祭坛已停用，典籍已取回。",
+  "advancements.ancient_remnants_add.ancient_heart_ruin.title": "过往的幻影",
+  "advancements.ancient_remnants_add.ancient_heart_ruin.description": "发现一座残缺的远古之心祭坛。",
+  "advancements.ancient_remnants_add.glory_reborn.title": "荣光再现",
+  "advancements.ancient_remnants_add.glory_reborn.description": "修复祭坛，献上完整的巨石典籍，唤醒远古之心。",
+  "message.ancient_remnants_add.altar.incomplete": "远古之心需要一本已补齐全部条目的巨石典籍。",
+  "message.ancient_remnants_add.altar.activated": "远古之心在尖塔之上苏醒。",
+  "message.ancient_remnants_add.altar.sacrificed": "远古之心碎裂，典籍坠落。",
   "item.breeze_backport.wind_charge": "风弹",
   "item.breeze_backport.breeze_spawn_egg": "旋风人刷怪蛋"
 }

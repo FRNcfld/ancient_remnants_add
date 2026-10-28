@@ -8,6 +8,12 @@
           "condition": "minecraft:survives_explosion"
         },
         {
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "part": "root"
+          }
+        },
+        {
           "condition": "minecraft:match_tool",
           "predicate": {
             "enchantments": [
@@ -24,10 +30,10 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "ancient_remnants_add:monolith_altar"
+          "name": "ancient_remnants_add:ancient_heart"
         }
       ]
     }
   ],
-  "random_sequence": "ancient_remnants_add:blocks/monolith_altar"
+  "random_sequence": "ancient_remnants_add:blocks/ancient_heart"
 }

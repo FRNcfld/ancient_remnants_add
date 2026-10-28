@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 巨石祭坛生效期间，判断哪些方块算「作物」，以及是否要额外掉一份。
+ * 远古之心生效期间，判断哪些方块算「作物」，以及是否要额外掉一份。
  *
  * <p>覆盖范围由数据包标签 {@code ancient_remnants_add:altar_harvestable} 决定：
  * 默认包含原版所有农作物的成熟方块、下界疣、甘蔗、甜浆果、可可、竹子、仙人掌、

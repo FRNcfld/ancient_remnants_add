@@ -70,7 +70,13 @@ public final class AncientEchoAdvancement {
         return progress.getOrStartProgress(advancement).isDone();
     }
 
-    /** 供祭坛右键检查：玩家手里这一本是否已解锁全部条目。 */
+    /** 客户端/服务端都可用的快速判断：是不是巨石典籍（不检查条目是否齐全）。 */
+    public static boolean isCodex(ItemStack stack) {
+        Item item = codexItem();
+        return item != null && stack.is(item);
+    }
+
+    /** 供祭坛仪式检查：玩家手里这一本是否已解锁全部条目。 */
     public static boolean isCompleteCodex(ServerPlayer player, ItemStack stack) {
         Item item = codexItem();
         if (item == null || !stack.is(item)) {

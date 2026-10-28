@@ -1,6 +1,6 @@
 {
   "type": "minecraft:chest",
-  "random_sequence": "ancient_remnants_add:injections/ancient_city_altar",
+  "random_sequence": "ancient_remnants_add:injections/ancient_city_ancient_heart",
   "pools": [
     {
       "rolls": 1,
@@ -13,7 +13,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "ancient_remnants_add:monolith_altar"
+          "name": "ancient_remnants_add:ancient_heart"
         }
       ]
     }

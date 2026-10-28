@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "part=root,active=false": {
+      "model": "ancient_remnants_add:block/ancient_heart"
+    },
+    "part=east,active=false": {
+      "model": "ancient_remnants_add:block/ancient_heart"
+    },
+    "part=south,active=false": {
+      "model": "ancient_remnants_add:block/ancient_heart"
+    },
+    "part=south_east,active=false": {
+      "model": "ancient_remnants_add:block/ancient_heart"
+    },
+    "part=root,active=true": {
+      "model": "ancient_remnants_add:block/ancient_heart_active"
+    },
+    "part=east,active=true": {
+      "model": "ancient_remnants_add:block/ancient_heart_active"
+    },
+    "part=south,active=true": {
+      "model": "ancient_remnants_add:block/ancient_heart_active"
+    },
+    "part=south_east,active=true": {
+      "model": "ancient_remnants_add:block/ancient_heart_active"
+    }
+  }
+}

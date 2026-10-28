@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 /**
- * 巨石祭坛激活后，所在维度的所有作物破坏/收割都按丰收概率额外掉一份。
+ * 远古之心激活后，所在维度的所有作物破坏/收割都按丰收概率额外掉一份。
  *
  * <p>挂在 {@link Block#getDrops} 上可以同时覆盖玩家破坏、活塞/水流/爆炸、
  * Create 收割机等一切走原版战利品掉落的路径。玩家自己带丰收祝福且破坏的是
