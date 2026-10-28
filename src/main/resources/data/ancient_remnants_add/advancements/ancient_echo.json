@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "item": "ancient_remnants:monolith_codex"
+    },
+    "title": {
+      "translate": "advancements.ancient_remnants_add.ancient_echo.title"
+    },
+    "description": {
+      "translate": "advancements.ancient_remnants_add.ancient_echo.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false,
+    "background": "minecraft:textures/block/deepslate_tiles.png"
+  },
+  "criteria": {
+    "unlocked_codex": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "unlocked_codex"
+    ]
+  ]
+}

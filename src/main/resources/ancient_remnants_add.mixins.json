@@ -4,8 +4,32 @@
     "package": "com.frnc.ancient_remnants_add.mixin",
     "compatibilityLevel": "JAVA_17",
     "refmap": "ancient_remnants_add.refmap.json",
-    "mixins": [],
-    "client": [],
+    "plugin": "com.frnc.ancient_remnants_add.mixin.AncientRemnantsAddMixinPlugin",
+    "mixins": [
+        "create.MixinBasinRecipeChance",
+        "create.MixinCrushingWheelChance",
+        "create.MixinFillingBySpoutChance",
+        "create.MixinGenericItemEmptyingChance",
+        "create.MixinManualApplicationChance",
+        "create.MixinMillstoneChance",
+        "create.MixinProcessingOutputChance",
+        "create.MixinRecipeApplierChance",
+        "create.MixinSawChance",
+        "MixinAncientRemnantsApi",
+        "MixinBlessingCommands",
+        "MixinBlockAltarDrops",
+        "MixinBountifulHarvestEffectCompanion",
+        "MixinDesperateVitalityEffect",
+        "MixinHunterInstinctsEffect",
+        "MixinPlayerBlessings",
+        "MixinSentinelAegisEffect",
+        "MixinServerPlayerBlessings",
+        "MixinSweetBerryBushAltar",
+        "MixinWarriorWrathEffect"
+    ],
+    "client": [
+        "client.MixinMonolithCodexPageFont"
+    ],
     "injectors": {
         "defaultRequire": 1
     }

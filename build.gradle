@@ -144,20 +144,28 @@ dependencies {
     // Specify the version of Minecraft to use.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    // ---- 上游一：机械动力（Create）----
-    // create 用 slim 分类器并把 transitive 关掉，避免把 Create 自带的 libs 重复拉进来；
-    // Flywheel 只编译期用 API，运行时用完整 jar。
-    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
-    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+    // ---- 可选联动：机械动力（Create）----
+    // Create 不是硬依赖：玩家没装 Create 也能启动。compileOnly 只用于编译期引用，
+    // runtimeOnly 只把 Create 拉进开发环境方便联调，不会打进本 mod 的 jar。
+    // 以后新增直接引用 Create 类的代码时，务必用 ModList.get().isLoaded(CREATE_MOD_ID)
+    // 或单独的 @Mod.EventBusSubscriber 隔离，避免没装 Create 时类加载失败。
+    compileOnly(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+    compileOnly(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+    compileOnly(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
     compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
+    runtimeOnly(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
+    runtimeOnly(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
+    runtimeOnly(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
     runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
-    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
 
     // ---- 上游二：远古遗迹（Ancient Remnants）----
     // 代码需要直接引用它的类（本 mod 就是给它做扩展的），所以用 implementation。
     // implementation = 编译期可见 + 开发环境运行时可用；玩家环境由 mods.toml 的 mandatory 依赖保证。
     implementation fg.deobf("maven.modrinth:ancient-remnants:${ancient_remnants_version}")
-    // Fragmentum 是远古遗迹的硬前置，本 mod 不直接引用它的类，只保证开发环境能跑起来。
+    // Fragmentum 是远古遗迹的硬前置。上游类的公开签名里带有它的类型
+    // （例如 Blessing 的效果字段是 Deferred<MobEffect>），编译期需要可见；
+    // 玩家环境由 Ancient Remnants 的 mandatory 依赖保证，不随本 mod 打包。
+    compileOnly fg.deobf("maven.modrinth:fragmentum:${fragmentum_version}")
     runtimeOnly fg.deobf("maven.modrinth:fragmentum:${fragmentum_version}")
 
     // ---- 开发环境补齐（生产环境由 Fragmentum 的 jarjar 提供，不随本 mod 分发）----

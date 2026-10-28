@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:chest",
+  "random_sequence": "ancient_remnants_add:injections/ancient_city_altar",
+  "pools": [
+    {
+      "rolls": 1,
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.25
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "ancient_remnants_add:monolith_altar"
+        }
+      ]
+    }
+  ]
+}

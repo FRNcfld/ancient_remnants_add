@@ -13,7 +13,7 @@ displayName="${mod_name}"
 authors="${mod_authors}"
 
 # 说明文本直接写在这里（不要放进 gradle.properties：那里被 Gradle 以 ISO-8859-1 读取，中文会乱码）。
-description='''远古遗迹（Ancient Remnants）与机械动力（Create）的附属模组：在两者的机制之间搭建联动内容。'''
+description='''远古遗迹（Ancient Remnants）的附属模组，并与机械动力（Create）做可选联动。'''
 
 [[dependencies.${mod_id}]]
     modId="forge"
@@ -29,12 +29,13 @@ description='''远古遗迹（Ancient Remnants）与机械动力（Create）的�
     ordering="NONE"
     side="BOTH"
 
-# 机械动力：本 mod 的内容建立在它的机器与配方体系之上，属于硬依赖。
-# AFTER 让 Create 先完成注册，避免在它的注册表还没就绪时读到半成品。
+# 机械动力：可选联动模组。没装 Create 时本 mod 仍可启动；
+# 装了则 AFTER 让 Create 先完成注册，便于联动代码读取它的注册表。
+# 版本范围故意放宽到 *：当前没有必须匹配的 Create API，具体联动代码自行判断版本。
 [[dependencies.${mod_id}]]
     modId="create"
-    mandatory=true
-    versionRange="${create_version_range}"
+    mandatory=false
+    versionRange="*"
     ordering="AFTER"
     side="BOTH"
 

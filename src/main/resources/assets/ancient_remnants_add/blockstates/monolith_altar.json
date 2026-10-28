@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "active=false": {
+      "model": "ancient_remnants_add:block/monolith_altar"
+    },
+    "active=true": {
+      "model": "ancient_remnants_add:block/monolith_altar_active"
+    }
+  }
+}
