@@ -15,6 +15,7 @@
         "create.MixinProcessingOutputChance",
         "create.MixinRecipeApplierChance",
         "create.MixinSawChance",
+        "explorerscompass.MixinStructureSearchWorker",
         "MixinAncientRemnantsApi",
         "MixinBlessingCommands",
         "MixinBlockAltarDrops",

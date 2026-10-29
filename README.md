@@ -2,12 +2,13 @@
 扩展模组
 
 面向 Minecraft **1.20.1 / Forge** 的 [远古遗迹（Ancient Remnants）](https://modrinth.com/mod/ancient-remnants)
-附属模组，[机械动力（Create）](https://modrinth.com/mod/create) 作为可选联动。
+附属模组，[机械动力（Create）](https://modrinth.com/mod/create) 与
+[Explorer's Compass（结构指南针）](https://modrinth.com/mod/explorers-compass) 作为可选联动。
 
 > 当前状态：**已有玩法内容**。已实现多祝福、可配置的祝福数值、前哨站残片、
 > 2×2×1 远古之心、结构级祭坛仪式（修复/长按激活/守护/献祭）、祭坛层级祝福加成
-> 与机械概率扩散、残缺祭坛世界生成、「远古回响」「过往的幻影」「荣光再现」进度
-> 与 Create 概率产出联动。
+> 与机械概率扩散、残缺祭坛世界生成、「远古回响」「过往的幻影」「荣光再现」进度、
+> Create 概率产出联动，以及 Explorer's Compass 跳过已激活祭坛。
 > 加内容时按下面的「约定」一节往下写即可。
 
 ## 当前功能
@@ -136,6 +137,19 @@ JEI 仍是可选前置；未安装 JEI 时插件类不会被加载，游戏与�
 - Create 未安装时，`mixin/create` 下的 mixin 由 `AncientRemnantsAddMixinPlugin` 跳过，
   不会因为缺少 Create 类而崩溃。
 
+### Explorer's Compass 联动
+
+- 结构指南针搜索「残缺祭坛」（`ancient_remnants_add:ancient_heart_ruin`）时，
+  **已激活**的祭坛不会被当作目标；搜索会继续向外找未激活的遗迹。
+- 未修复、已修复但未激活的祭坛仍可被正常定位；激活后再次搜索不会把玩家引向该据点。
+- 三个搜索 worker（RandomSpread / ConcentricRings / Generic）都经过
+  `StructureSearchWorker#getStructureGeneratingAt`；过滤只针对本模组的
+  `AncientHeartRuinStructure`，不按坐标一刀切，因此单结构搜索与「全部结构」分组搜索行为一致。
+- Explorer's Compass 未安装时，`mixin/explorerscompass` 下的 mixin 由
+  `AncientRemnantsAddMixinPlugin` 跳过，不会因为缺少上游类而崩溃。
+- 版本以 `gradle.properties` 的 `explorers_compass_version`（1.20.1-1.4.0）为基准；
+  注入使用 `require = 0`，上游改版导致注入点消失时退回原版搜索行为，不影响启动。
+
 ## 环境要求
 
 | 项目 | 版本 |
@@ -145,6 +159,7 @@ JEI 仍是可选前置；未安装 JEI 时插件类不会被加载，游戏与�
 | Java | 17 |
 | 映射 | Parchment `2023.08.20-1.20.1`（叠加官方映射；联调 Create 6.0.x 时必须与它一致） |
 | Create（可选） | 6.0.8+；未安装也能启动 |
+| Explorer's Compass（可选联动） | 1.20.1-1.4.0（`explorerscompass`）；未安装也能启动 |
 
 ## 依赖说明
 
@@ -155,6 +170,7 @@ JEI 仍是可选前置；未安装 JEI 时插件类不会被加载，游戏与�
 | Create（机械动力，可选联动） | `com.simibubi.create:create-1.20.1:6.0.8-289:slim` | `compileOnly` + `runtimeOnly`（仅开发环境） | `mods.toml` 里 `mandatory=false`，玩家没装 Create 也能启动；`slim` 分类器不内嵌依赖，所以 Ponder / Registrate / Flywheel 要一并声明。以后新增直接引用 Create 类的代码必须做存在性隔离 |
 | Ancient Remnants（远古遗迹） | `maven.modrinth:ancient-remnants:r3G6hu9a`（= 1.5.2 / 1.20.1-forge） | `implementation` | 硬依赖，代码直接引用它的类 |
 | Fragmentum | `maven.modrinth:fragmentum:T7QOSm4k`（= 5.4.0 / 1.20.1-forge） | `compileOnly` + `runtimeOnly` | 远古遗迹的硬前置框架（它的 `mods.toml` 里 `mandatory=true`、`[5.2.0,)`）。上游类的公开签名里带有它的类型（如 `Deferred`），编译期需要可见；玩家环境由远古遗迹的 mandatory 依赖提供，不打包 |
+| Explorer's Compass（结构指南针，可选联动） | `maven.modrinth:explorers-compass:7ZdJbCOx`（= 1.20.1-1.4.0-forge） | `compileOnly` + `runtimeOnly`（仅开发环境） | `mods.toml` 里 `mandatory=false`，玩家没装也能启动；只用于编译期引用与开发环境联调，不打包 |
 | JEI | `mezz.jei:jei-1.20.1-forge-api:15.56.0.205` | `compileOnly`（API）+ `runtimeOnly`（完整 jar） | 只是可选兼容，`mods.toml` 里 `mandatory=false`，不打包、不强制玩家安装 |
 
 **为什么用 Modrinth 的「版本 id」而不是版本号**：Modrinth 的 maven 里同一个版本号会对应多个
@@ -235,13 +251,13 @@ src/main/java/com/frnc/ancient_remnants_add/
 ├── jei/                      # JEI 物品信息页（祭坛教程，可选）
 ├── loot/                     # 前哨站残片掉落接入
 ├── worldgen/                 # 残缺祭坛结构、afterPlace 站点登记、遗迹邻近放置、结构模板片段
-└── mixin/                    # 多祝福 / 上游 API / 祝福效果 / 祭坛 / 典籍字体；create/ 为可选联动，client/ 为客户端修复
+└── mixin/                    # 多祝福 / 上游 API / 祝福效果 / 祭坛 / 典籍字体；create/、explorerscompass/ 为可选联动，client/ 为客户端修复
 src/main/resources/
 ├── META-INF/mods.toml        # 模组元数据（modId / 版本 / 硬依赖与可选联动）
 ├── assets/ancient_remnants_add/   # 远古之心模型、中英文 lang（含进度文本/风弹/旋风人译名）
 ├── data/ancient_remnants_add/     # 战利品、古城注入、作物/献祭实体标签、三个进度、残缺祭坛结构与世界生成、altar_boost.json
 ├── pack.mcmeta               # 资源包描述
-└── ancient_remnants_add.mixins.json   # mixin 清单（11 个通用 + 9 个 Create 可选 + 1 个客户端）
+└── ancient_remnants_add.mixins.json   # mixin 清单（11 个通用 + 9 个 Create 可选 + 1 个 Explorer's Compass 可选 + 1 个客户端）
 ```
 
 ## 约定
@@ -260,6 +276,12 @@ src/main/resources/
   `build.gradle` 里只 `compileOnly` API（不打包），完整 jar 只 `runtimeOnly` 进开发环境方便调试兼容。
   因此引用 JEI 的类必须放在**不会被无条件加载**的地方（单独的 `@JeiPlugin` 类，或先
   `ModList.get().isLoaded("jei")` 再进分支），否则没装 JEI 的整合包会在类加载阶段 `NoClassDefFoundError`。
+- **可选联动（Explorer's Compass）**：同样是软依赖——`mods.toml` 里 `mandatory=false`，
+  `build.gradle` 里 `compileOnly` + 仅开发环境的 `runtimeOnly`，不打包。
+  引用其类的普通代码要放在 `ModList.get().isLoaded("explorerscompass")` 分支或单独的类里，
+  否则没装它的整合包会在类加载阶段 `NoClassDefFoundError`。Explorer's Compass 专用 mixin
+  放在 `mixin/explorerscompass`，由 `AncientRemnantsAddMixinPlugin` 在它不存在时跳过；
+  mixin 类本身只把上游类名写在 `@Mixin(targets = ...)` 字符串里，不直接引用上游类型。
 - **mixin**：MixinGradle 管线（含 refmap 与开发环境 `mixin.env.remapRefMap`）已接好。
   新增 mixin 类时把它登记进 `ancient_remnants_add.mixins.json` 的 `mixins`（通用）或 `client`（仅客户端）列表
   ——**漏登记的典型症状是「编译进 jar 但运行时不生效」**，不会报错。

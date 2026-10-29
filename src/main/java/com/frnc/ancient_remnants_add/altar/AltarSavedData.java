@@ -152,6 +152,21 @@ public final class AltarSavedData extends SavedData {
         return null;
     }
 
+    /**
+     * 该区块内是否有已激活的祭坛站点。
+     *
+     * <p>残缺祭坛恰好占一个区块（结构 origin 对齐区块最小角，ROOT 在 origin + (15,3,15)），
+     * 所以用 ROOT 所在区块即可判断整座祭坛；供结构指南针跳过已激活的祭坛。
+     */
+    public boolean hasActiveSiteInChunk(int chunkX, int chunkZ) {
+        for (BlockPos root : activeRoots) {
+            if ((root.getX() >> 4) == chunkX && (root.getZ() >> 4) == chunkZ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** 激活祭坛覆盖的 32×25×32 范围不可破坏。 */
     public boolean isProtected(BlockPos pos) {
         for (BlockPos root : activeRoots) {

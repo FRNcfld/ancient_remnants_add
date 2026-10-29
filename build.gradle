@@ -158,6 +158,12 @@ dependencies {
     runtimeOnly(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
     runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
 
+    // ---- 可选联动二：Explorer's Compass（结构指南针）----
+    // 软依赖：编译期可见、开发环境运行时可用，不打包；玩家装了才启用联动。
+    // 以后引用它的类必须做存在性隔离（见 README 约定），否则没装时会在类加载阶段失败。
+    compileOnly fg.deobf("maven.modrinth:explorers-compass:${explorers_compass_version}")
+    runtimeOnly fg.deobf("maven.modrinth:explorers-compass:${explorers_compass_version}")
+
     // ---- 上游二：远古遗迹（Ancient Remnants）----
     // 代码需要直接引用它的类（本 mod 就是给它做扩展的），所以用 implementation。
     // implementation = 编译期可见 + 开发环境运行时可用；玩家环境由 mods.toml 的 mandatory 依赖保证。

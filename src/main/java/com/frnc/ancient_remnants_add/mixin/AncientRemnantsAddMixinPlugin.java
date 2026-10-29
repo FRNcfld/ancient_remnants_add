@@ -8,17 +8,22 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Create 是软依赖，所以 create 子包下的 mixin 只有在检测到 Create 类存在时才应用。
+ * Create 与 Explorer's Compass 都是软依赖，所以它们子包下的 mixin
+ * 只有在检测到对应模组的类存在时才应用。
  *
- * <p>没装 Create 时，这些 mixin 直接从目标集合里移除，不会因为目标类缺失而崩溃；
+ * <p>没装对应模组时，这些 mixin 直接从目标集合里移除，不会因为目标类缺失而崩溃；
  * 其余（远古遗迹相关）mixin 不受影响。
  */
 public final class AncientRemnantsAddMixinPlugin implements IMixinConfigPlugin {
 
     private static final String CREATE_MIXIN_PREFIX =
             "com.frnc.ancient_remnants_add.mixin.create.";
+    private static final String EXPLORERS_COMPASS_MIXIN_PREFIX =
+            "com.frnc.ancient_remnants_add.mixin.explorerscompass.";
 
     private static final boolean CREATE_PRESENT = isClassPresent("com.simibubi.create.Create");
+    private static final boolean EXPLORERS_COMPASS_PRESENT =
+            isClassPresent("com.chaosthedude.explorerscompass.worker.StructureSearchWorker");
 
     private static boolean isClassPresent(String className) {
         ClassLoader[] loaders = {
@@ -52,6 +57,9 @@ public final class AncientRemnantsAddMixinPlugin implements IMixinConfigPlugin {
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.startsWith(CREATE_MIXIN_PREFIX)) {
             return CREATE_PRESENT;
+        }
+        if (mixinClassName.startsWith(EXPLORERS_COMPASS_MIXIN_PREFIX)) {
+            return EXPLORERS_COMPASS_PRESENT;
         }
         return true;
     }
