@@ -1,6 +1,8 @@
 package com.frnc.ancient_remnants_add.mixin;
 
 import com.frnc.ancient_remnants_add.Config;
+import com.frnc.ancient_remnants_add.altar.AltarBoostScope;
+import com.frnc.ancient_remnants_add.blessing.BlessingIds;
 import dev.obscuria.ancient_remnants.common.effect.SentinelAegisEffect;
 import dev.obscuria.ancient_remnants.common.effect.Value;
 import net.minecraft.world.damagesource.DamageSource;
@@ -28,7 +30,8 @@ public abstract class MixinSentinelAegisEffect {
     ) {
         float missing = 1.0F - self.getHealth() / self.getMaxHealth();
         missing = Math.max(0.0F, Math.min(1.0F, missing));
-        value.multiply(1.0F + missing * (float) Config.sentinelAegisArmorBonusPerHealthPercent());
+        float altar = (float) AltarBoostScope.multiplierFor(self, BlessingIds.SENTINEL_AEGIS);
+        value.multiply(1.0F + missing * (float) Config.sentinelAegisArmorBonusPerHealthPercent() * altar);
         ci.cancel();
     }
 }

@@ -162,6 +162,11 @@ public final class AltarSavedData extends SavedData {
         return false;
     }
 
+    /** 该维度当前激活祭坛数；只允许在服务端主线程读取。 */
+    public int activeSiteCount() {
+        return activeRoots.size();
+    }
+
     public boolean hasActiveSite() {
         return !activeRoots.isEmpty();
     }

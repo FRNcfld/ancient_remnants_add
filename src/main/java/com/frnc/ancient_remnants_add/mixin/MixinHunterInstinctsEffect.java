@@ -1,7 +1,11 @@
 package com.frnc.ancient_remnants_add.mixin;
 
 import com.frnc.ancient_remnants_add.Config;
+import com.frnc.ancient_remnants_add.altar.AltarBoostScope;
+import com.frnc.ancient_remnants_add.blessing.BlessingIds;
+import com.llamalad7.mixinextras.sugar.Local;
 import dev.obscuria.ancient_remnants.common.effect.HunterInstinctsEffect;
+import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -38,7 +42,12 @@ public abstract class MixinHunterInstinctsEffect {
             index = 0,
             remap = false
     )
-    private float ancientRemnantsAdd$maxDamageBonus(float multiplier) {
-        return 1.0F + (multiplier - 1.0F) * (float) Config.hunterInstinctsMaxDamageBonus();
+    private float ancientRemnantsAdd$maxDamageBonus(
+            float multiplier,
+            @Local(argsOnly = true, ordinal = 0) LivingEntity self
+    ) {
+        float configured = 1.0F + (multiplier - 1.0F) * (float) Config.hunterInstinctsMaxDamageBonus();
+        float altar = (float) AltarBoostScope.multiplierFor(self, BlessingIds.HUNTER_INSTINCTS);
+        return 1.0F + (configured - 1.0F) * altar;
     }
 }

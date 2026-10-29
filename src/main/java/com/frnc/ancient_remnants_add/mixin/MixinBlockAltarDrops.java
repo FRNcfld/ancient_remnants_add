@@ -1,7 +1,7 @@
 package com.frnc.ancient_remnants_add.mixin;
 
+import com.frnc.ancient_remnants_add.altar.AltarBoostScope;
 import com.frnc.ancient_remnants_add.altar.AltarHarvestHelper;
-import com.frnc.ancient_remnants_add.altar.AltarSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -17,7 +17,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 /**
- * 远古之心激活后，所在维度的所有作物破坏/收割都按丰收概率额外掉一份。
+ * 祭坛丰收：在祭坛丰收生效范围内，作物破坏/收割按丰收概率额外掉一份。
+ *
+ * <p>范围与祭坛层级一致：&lt;3 座只在该作物处于某个激活祭坛 32×25×32 范围内生效；
+ * 3–8 座本维度；9+ 座源/数据文件目标维度。概率仍是 {@code bountifulHarvestChance}，
+ * 不随祭坛数量叠加。
  *
  * <p>挂在 {@link Block#getDrops} 上可以同时覆盖玩家破坏、活塞/水流/爆炸、
  * Create 收割机等一切走原版战利品掉落的路径。玩家自己带丰收祝福且破坏的是
@@ -39,7 +43,7 @@ public abstract class MixinBlockAltarDrops {
         if (!AltarHarvestHelper.isHarvestable(state)) {
             return;
         }
-        if (!AltarSavedData.get(level).isActive(level)) {
+        if (!AltarBoostScope.harvestEnabledAt(level, pos)) {
             return;
         }
         if (AltarHarvestHelper.shouldSkipForPersonalBlessing(entity, state)) {

@@ -5,8 +5,9 @@
 附属模组，[机械动力（Create）](https://modrinth.com/mod/create) 作为可选联动。
 
 > 当前状态：**已有玩法内容**。已实现多祝福、可配置的祝福数值、前哨站残片、
-> 2×2×1 远古之心、结构级祭坛仪式（修复/长按激活/守护/献祭）、残缺祭坛世界生成、
-> 「远古回响」「过往的幻影」「荣光再现」进度与 Create 概率产出 +50% 联动。
+> 2×2×1 远古之心、结构级祭坛仪式（修复/长按激活/守护/献祭）、祭坛层级祝福加成
+> 与机械概率扩散、残缺祭坛世界生成、「远古回响」「过往的幻影」「荣光再现」进度
+> 与 Create 概率产出联动。
 > 加内容时按下面的「约定」一节往下写即可。
 
 ## 当前功能
@@ -57,8 +58,9 @@
     掉落沙、TNT、船/矿车等；玩家和生物（村民、宠物等）保留；
   - 激活后整个 **32×25×32** 祭坛结构不可破坏：玩家挖掘被取消，爆炸不会破坏结构方块，
     活塞不能推动/破坏结构方块；
-  - 激活的祭坛所在维度内，所有通过原版战利品掉落的作物破坏/收割（玩家、活塞、水流、
-    爆炸、Create 收割机等）都按 `bountifulHarvestChance` 额外掉一份；
+  - 在祭坛丰收生效的范围内（<3 座仅祭坛范围内；3–8 座本维度；9+ 座源/目标维度），
+    所有通过原版战利品掉落的作物破坏/收割（玩家、活塞、水流、爆炸、Create 收割机等）
+    都按 `bountifulHarvestChance` 额外掉一份；
   - 作物范围由 `ancient_remnants_add:altar_harvestable` 方块标签控制，默认包含
     CropBlock、下界疣、甘蔗、甜浆果、可可、竹子、仙人掌、海带、西瓜、南瓜；
   - 甜浆果右键收割也覆盖；
@@ -75,6 +77,46 @@
 - 创造模式物品栏：已加入「工具与实用物品」标签（与典籍、残片一致），搜索也能搜到。
 - 风弹/旋风人刷怪蛋的中文名由本 mod 的 `zh_cn` 补齐为「风弹」「旋风人刷怪蛋」。
 
+### 祭坛层级祝福加成
+
+- 每座激活祭坛让**数据文件指定的祝福**效果 +100%（`altarBlessingBoostPerAltar`，默认 1.0，加算叠加）；
+  每种祝福有独立的叠加上限。
+- 倍率 = `1 + altarBlessingBoostPerAltar × min(有效祭坛数, max_stacks)`。
+- 范围：
+  - **<3 座**：只有站在任一激活祭坛 **32×25×32** 范围内的玩家获得加成；
+  - **3–8 座**：该维度所有玩家获得；
+  - **9+ 座**：源维度 + 数据文件 `spread_dimensions` 列出的其他维度；多个 9+ 源取最大源计数。
+- 数据文件 `data/ancient_remnants_add/altar_boost.json`（数据包可覆盖，`/reload` 生效）：
+  ```json
+  {
+    "blessings": [
+      { "blessing": "ancient_remnants:hunter_instincts", "max_stacks": 9 }
+    ],
+    "spread_dimensions": ["minecraft:overworld", "minecraft:the_nether", "minecraft:the_end"]
+  }
+  ```
+  - 缺省某个祝福 = 不 boost；缺省 `spread_dimensions` = 9+ 只影响源维度自身；
+  - 出厂文件包含六种祝福，`max_stacks` 默认 9；可自行调低/删除条目。
+- 覆盖的数值：猎人本能/战士之怒伤害、哨兵护甲、丰收概率（封顶 1.0）、绝境活力吸收、建筑师之触。
+- Create 机械概率：**1–2 座不启用；3–8 座本维度 ×1.5；9+ 源维度与 `spread_dimensions` 目标维度启用**。
+- 祭坛丰收（`altar_harvestable`）也使用同一层级范围：**<3 座仅祭坛范围内；3–8 座本维度；9+ 座源/目标维度**；概率仍是 `bountifulHarvestChance`，不随祭坛数叠加。
+
+### JEI 教程
+
+安装 JEI 后，在 JEI 中查看**远古之心**或**巨石典籍**的物品信息（默认 `R` 键），
+会显示祭坛教程页：
+
+- 获取与修复；
+- Shift + 长按右键激活；
+- 激活后的结构修复/清场/不可破坏与休眠核心；
+- 祝福加成层级（<3 / 3–8 / 9+）与数据文件 `altar_boost.json`；
+- 祭坛丰收（`altar_harvestable`）的同一层级范围；
+- Create 概率的层级启用；
+- 献祭与重新激活；
+- 进度、精准采集和旧存档说明。
+
+JEI 仍是可选前置；未安装 JEI 时插件类不会被加载，游戏与祭坛机制不受影响。
+
 ### 典籍中文显示
 
 上游的典籍界面会把研究标题/正文强制套上 `ancient_remnants:header` 的 TTF 字体，
@@ -85,10 +127,12 @@
 
 ### Create 联动
 
-- 远古之心激活的维度里，Create 的 `ProcessingOutput` 概率产出 chance ×1.5（封顶 100%）。
+- **1–2 座**激活祭坛：不启用 Create 概率加成。
+- **3–8 座**：该维度内 Create 的 `ProcessingOutput` 概率产出 chance ×1.5（封顶 100%）。
+- **9+ 座**：源维度 + `altar_boost.json` 中 `spread_dimensions` 列出的目标维度都启用。
 - 覆盖粉碎轮、磨石、锯、工作盆混合、手动应用、注液/排空以及 Deployer/Fan 使用的
   `RecipeApplier` 路径。
-- 没有激活远古之心的维度、JEI 预览等没有机器上下文的掷骰不会增强。
+- 没有达到层级的维度、JEI 预览等没有机器上下文的掷骰不会增强。
 - Create 未安装时，`mixin/create` 下的 mixin 由 `AncientRemnantsAddMixinPlugin` 跳过，
   不会因为缺少 Create 类而崩溃。
 
@@ -139,6 +183,7 @@ Fragmentum 用 **jarjar** 内嵌了 Kotlin for Forge、YetAnotherConfigLib 与 M
 |---|---|---|
 | `debugLogging` | `true` | 输出本 mod 的调试日志 |
 | `maxBlessings` | `6` | 玩家同时持有的祝福上限（1–64）；满额时新祝福替换最早获得的 |
+| `altarBlessingBoostPerAltar` | `1.0` | 每座计数祭坛的祝福加成（1.0 = +100%），0 关闭；按 `altar_boost.json` 的 `max_stacks` 截断 |
 
 `[blessings]` 段（六个祝福的数值）：
 
@@ -183,17 +228,18 @@ Fragmentum 用 **jarjar** 内嵌了 Kotlin for Forge、YetAnotherConfigLib 与 M
 src/main/java/com/frnc/ancient_remnants_add/
 ├── AncientRemnantsAdd.java   # 主入口（@Mod）：注册事件总线、通用配置，并给出 id() 快捷方法
 ├── Config.java               # 通用配置（config/ancient_remnants_add-common.toml）
-├── altar/                    # 远古之心、站点 SavedData、长按激活、结构保护、献祭、进度
+├── altar/                    # 远古之心、站点 SavedData、长按激活、结构保护、献祭、层级加成、进度
 ├── blessing/                 # 多祝福列表、NBT 编解码、tick 同步与祝福数值后处理
 ├── client/                   # 远古之心 BlockEntityRenderer（尖塔上方的休眠核心）
 ├── create/                   # Create 概率产出 +50% 的线程上下文
+├── jei/                      # JEI 物品信息页（祭坛教程，可选）
 ├── loot/                     # 前哨站残片掉落接入
 ├── worldgen/                 # 残缺祭坛结构、afterPlace 站点登记、遗迹邻近放置、结构模板片段
 └── mixin/                    # 多祝福 / 上游 API / 祝福效果 / 祭坛 / 典籍字体；create/ 为可选联动，client/ 为客户端修复
 src/main/resources/
 ├── META-INF/mods.toml        # 模组元数据（modId / 版本 / 硬依赖与可选联动）
 ├── assets/ancient_remnants_add/   # 远古之心模型、中英文 lang（含进度文本/风弹/旋风人译名）
-├── data/ancient_remnants_add/     # 战利品、古城注入、作物/献祭实体标签、三个进度、残缺祭坛结构与世界生成
+├── data/ancient_remnants_add/     # 战利品、古城注入、作物/献祭实体标签、三个进度、残缺祭坛结构与世界生成、altar_boost.json
 ├── pack.mcmeta               # 资源包描述
 └── ancient_remnants_add.mixins.json   # mixin 清单（11 个通用 + 9 个 Create 可选 + 1 个客户端）
 ```

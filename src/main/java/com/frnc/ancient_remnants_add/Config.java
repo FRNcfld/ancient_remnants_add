@@ -35,6 +35,12 @@ public final class Config {
                     "When the limit is reached, a newly acquired blessing replaces the oldest one.")
             .defineInRange("maxBlessings", 6, 1, 64);
 
+    private static final ForgeConfigSpec.DoubleValue ALTAR_BLESSING_BOOST_PER_ALTAR = BUILDER
+            .comment("Blessing effect boost per active altar. 1.0 means +100% per counted altar.",
+                    "Stacking is additive and capped per blessing by data/ancient_remnants_add/altar_boost.json.",
+                    "0 disables altar blessing boosts.")
+            .defineInRange("altarBlessingBoostPerAltar", 1.0D, 0.0D, 10.0D);
+
     private static final ForgeConfigSpec.DoubleValue BOUNTIFUL_HARVEST_CHANCE = BUILDER
             .push("blessings")
             .comment("Chance (0-1) for Bountiful Harvest to duplicate the drops of a fully grown crop.")
@@ -90,6 +96,7 @@ public final class Config {
     private static boolean debugLogging;
     private static int maxBlessings = 6;
 
+    private static double altarBlessingBoostPerAltar = 1.0D;
     private static double bountifulHarvestChance = 0.5D;
     private static double hunterInstinctsMaxDistance = 64.0D;
     private static double hunterInstinctsMaxDamageBonus = 1.0D;
@@ -112,6 +119,10 @@ public final class Config {
 
     public static int maxBlessings() {
         return maxBlessings;
+    }
+
+    public static double altarBlessingBoostPerAltar() {
+        return altarBlessingBoostPerAltar;
     }
 
     public static double bountifulHarvestChance() {
@@ -177,6 +188,7 @@ public final class Config {
         debugLogging = DEBUG_LOGGING.get();
         maxBlessings = MAX_BLESSINGS.get();
 
+        altarBlessingBoostPerAltar = ALTAR_BLESSING_BOOST_PER_ALTAR.get();
         bountifulHarvestChance = BOUNTIFUL_HARVEST_CHANCE.get();
         hunterInstinctsMaxDistance = HUNTER_INSTINCTS_MAX_DISTANCE.get();
         hunterInstinctsMaxDamageBonus = HUNTER_INSTINCTS_MAX_DAMAGE_BONUS.get();

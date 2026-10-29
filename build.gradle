@@ -172,6 +172,7 @@ dependencies {
     // MixinExtras 是 Create 6.0 的 mixin 依赖（如 BuiltInRegistriesMixin 使用 @WrapOperation），
     // slim 分类器把 Create 内嵌库剥离了；Fragmentum 也内嵌了一份。玩家环境由 jarjar 提供，
     // 开发环境必须显式补上，否则 mixin 应用阶段会 ClassMetadataNotFoundException。
+    compileOnly "io.github.llamalad7:mixinextras-common:${mixinextras_version}"
     runtimeOnly "io.github.llamalad7:mixinextras-forge:${mixinextras_version}"
     // 远古遗迹与 Fragmentum 是 Kotlin 写的，Kotlin for Forge 提供 Kotlin 运行时。
     runtimeOnly fg.deobf("maven.modrinth:kotlin-for-forge:${kotlinforforge_version}")

@@ -2,6 +2,7 @@ package com.frnc.ancient_remnants_add.blessing;
 
 import com.frnc.ancient_remnants_add.AncientRemnantsAdd;
 import com.frnc.ancient_remnants_add.Config;
+import com.frnc.ancient_remnants_add.altar.AltarBoostScope;
 import dev.obscuria.ancient_remnants.access.IPlayerAccess;
 import dev.obscuria.ancient_remnants.common.Blessing;
 import net.minecraft.core.Holder;
@@ -37,7 +38,57 @@ public final class BlessingTuning {
     private static final UUID ARCHITECT_REACH_MODIFIER_ID =
             UUID.fromString("839056a5-f3ae-4e48-ae6c-96d38db30a38");
 
+    /** 祭坛倍率带来的额外触及距离；与上游基础 +3 的 UUID/name 都不同。 */
+    private static final UUID ALTAR_REACH_MODIFIER_ID =
+            UUID.fromString("0e8b6a8e-8f6c-4c9a-9c1a-2f8c4b7d6e31");
+    private static final String ALTAR_REACH_MODIFIER_NAME = "ancient_remnants_add:altar_reach";
+    private static final double EPSILON = 1.0E-6D;
+
     private BlessingTuning() {
+    }
+
+    /**
+     * 每玩家 tick：按当前祭坛倍率维护建筑师之触的「额外」触及距离。
+     *
+     * <p>基础 +3 仍由效果自身的属性修正器提供（{@link #applyArchitectReach()} 同步配置值）；
+     * 这里只添加补充量 {@code 基础值 × (multiplier - 1)}，避免和基础值重复计算。
+     */
+    public static void updateAltarReach(ServerPlayer player) {
+        if (!ForgeMod.BLOCK_REACH.isPresent()) {
+            return;
+        }
+        AttributeInstance instance = player.getAttribute(ForgeMod.BLOCK_REACH.get());
+        if (instance == null) {
+            return;
+        }
+        MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(ARCHITECT_REACH);
+        boolean holds = effect != null && player.hasEffect(effect);
+        double multiplier = holds
+                ? AltarBoostScope.multiplierFor(player, BlessingIds.ARCHITECT_REACH)
+                : 1.0D;
+        double supplement = holds
+                ? Config.architectReachBonus() * (multiplier - 1.0D)
+                : 0.0D;
+
+        AttributeModifier old = instance.getModifier(ALTAR_REACH_MODIFIER_ID);
+        if (supplement <= EPSILON) {
+            if (old != null) {
+                instance.removeModifier(old);
+            }
+            return;
+        }
+        if (old != null && Math.abs(old.getAmount() - supplement) <= EPSILON) {
+            return;
+        }
+        if (old != null) {
+            instance.removeModifier(old);
+        }
+        instance.addTransientModifier(new AttributeModifier(
+                ALTAR_REACH_MODIFIER_ID,
+                ALTAR_REACH_MODIFIER_NAME,
+                supplement,
+                AttributeModifier.Operation.ADDITION
+        ));
     }
 
     public static void applyArchitectReach() {
@@ -76,6 +127,11 @@ public final class BlessingTuning {
             // 先清旧修正器，再决定要不要重挂：这一步与玩家当前是否持有祝福无关，
             // 因为旧 UUID 的修正器可能已经留在 AttributeMap 里了。
             removeStaleReachModifiers(player, attribute, effect);
+            AttributeInstance reach = player.getAttribute(attribute);
+            if (reach != null) {
+                // 配置重载时清掉祭坛补充，下一 tick 按新配置重建。
+                reach.removeModifier(ALTAR_REACH_MODIFIER_ID);
+            }
 
             if (!player.hasEffect(effect)) {
                 continue;

@@ -26,6 +26,7 @@ public final class BlessingEvents {
         }
         if (event.player instanceof ServerPlayer player) {
             MultiBlessings.sync(player);
+            BlessingTuning.updateAltarReach(player);
             DesperateVitalityHandler.tick(player);
             AncientEchoAdvancement.tick(player);
         }

@@ -103,7 +103,8 @@ public final class AltarHarvestHelper {
         return result;
     }
 
-    private static MobEffect bountifulHarvestEffect() {
+    /** 供祭坛/丰收 mixin 复用；注册表未就绪时返回 null。 */
+    public static MobEffect bountifulHarvestEffect() {
         if (bountifulHarvestEffect == null) {
             bountifulHarvestEffect = ForgeRegistries.MOB_EFFECTS.getValue(BOUNTIFUL_HARVEST);
         }

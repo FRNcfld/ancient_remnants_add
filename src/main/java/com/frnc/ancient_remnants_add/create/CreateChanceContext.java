@@ -1,7 +1,7 @@
 package com.frnc.ancient_remnants_add.create;
 
 import com.frnc.ancient_remnants_add.AncientRemnantsAdd;
-import com.frnc.ancient_remnants_add.altar.AltarSavedData;
+import com.frnc.ancient_remnants_add.altar.AltarBoostScope;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
@@ -11,9 +11,13 @@ import net.minecraftforge.fml.common.Mod;
 /**
  * Create 概率产出 +50% 的上下文。
  *
- * <p>Create 的加工机器没有玩家上下文，所以这里以「该维度是否有激活的远古之心」
- * 作为触发条件：在祭坛激活的维度里，所有经过 {@code ProcessingOutput.rollOutput}
- * 的概率产出都把概率乘以 1.5（封顶 100%）。
+ * <p>Create 的加工机器没有玩家上下文，所以这里以「该维度的祭坛层级」作为触发条件：
+ * <ul>
+ *   <li>1–2 座激活祭坛：不启用；</li>
+ *   <li>3–8 座：该维度内所有概率产出 ×1.5（封顶 100%）；</li>
+ *   <li>9+ 座：源维度 + 数据文件列出的扩散维度都启用。</li>
+ * </ul>
+ * 具体范围判断见 {@link AltarBoostScope#mechanicalEnabled(ServerLevel)}。
  *
  * <p>各个 Create 调用点在 {@code ProcessingRecipe.rollResults()} 前后通过
  * {@link #push(Level)} / {@link #clear()} 设置线程上下文；没有上下文的概率掷骰
@@ -40,7 +44,7 @@ public final class CreateChanceContext {
         int depth = DEPTH.get();
         if (depth == 0) {
             BOOST.set(level instanceof ServerLevel serverLevel
-                    && AltarSavedData.get(serverLevel).isActive(serverLevel));
+                    && AltarBoostScope.mechanicalEnabled(serverLevel));
         }
         DEPTH.set(depth + 1);
     }

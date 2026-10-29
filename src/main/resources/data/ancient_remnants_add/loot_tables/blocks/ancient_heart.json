@@ -9,6 +9,7 @@
         },
         {
           "condition": "minecraft:block_state_property",
+          "block": "ancient_remnants_add:ancient_heart",
           "properties": {
             "part": "root"
           }

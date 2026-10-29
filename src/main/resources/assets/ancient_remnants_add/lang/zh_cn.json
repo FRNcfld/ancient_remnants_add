@@ -9,6 +9,14 @@
   "message.ancient_remnants_add.altar.incomplete": "远古之心需要一本已补齐全部条目的巨石典籍。",
   "message.ancient_remnants_add.altar.activated": "远古之心在尖塔之上苏醒。",
   "message.ancient_remnants_add.altar.sacrificed": "远古之心碎裂，典籍坠落。",
+  "jei.ancient_remnants_add.altar.page1": "【获取与修复】远古之心有 25% 概率出现在古城/冰窖宝箱。残缺祭坛中央有 4 格空气；把 2×2 远古之心放进去即可修复站点，站点记录会保留。",
+  "jei.ancient_remnants_add.altar.page2": "【激活】手持已补齐全部研究条目的巨石典籍，站在祭坛 32×25×32 范围内，Shift + 长按右键 2 秒。典籍会被消耗并保存在祭坛记录中；Shift 可避免普通右键打开典籍界面。",
+  "jei.ancient_remnants_add.altar.page3": "【激活后】祭坛会按模板修复自身，把结构内的无关方块清成空气，并清除非生物实体（箭矢、掉落物、末影珍珠等）；中央尖塔顶部上方出现休眠核心；整个 32×25×32 结构不可破坏。",
+  "jei.ancient_remnants_add.altar.page4": "【祝福加成】每座激活祭坛让 altar_boost.json 指定的祝福 +100%（可配置、加算），按每种祝福 max_stacks 截断。<3 座仅祭坛范围内；3–8 座本维度；9+ 座源维度 + 数据文件目标维度。",
+  "jei.ancient_remnants_add.altar.page5": "【Create】1–2 座不启用；3–8 座本维度概率产出 ×1.5；9+ 座源维度与数据文件 spread_dimensions 目标维度启用。",
+  "jei.ancient_remnants_add.altar.page6": "【献祭与再激活】激活后在祭坛范围内由玩家击杀 altar_sacrifices 标签生物（默认村民）→ 远古之心被摧毁、祭坛熄灭、典籍掉在祭坛中心；站点保留，重新放远古之心可再激活。",
+  "jei.ancient_remnants_add.altar.page7": "【其他】未激活的远古之心可精准采集掉落；发现祭坛获得「过往的幻影」，激活获得「荣光再现」。旧存档的 Altars 数据不迁移。",
+  "jei.ancient_remnants_add.altar.page8": "【祭坛丰收】altar_harvestable 标签内的作物也按同一层级生效：<3 座仅祭坛范围内；3–8 座本维度；9+ 座源维度 + 数据文件目标维度。概率仍是 bountifulHarvestChance，不随祭坛数叠加。",
   "item.breeze_backport.wind_charge": "风弹",
   "item.breeze_backport.breeze_spawn_egg": "旋风人刷怪蛋"
 }

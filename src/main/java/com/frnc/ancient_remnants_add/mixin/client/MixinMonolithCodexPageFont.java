@@ -39,7 +39,7 @@ public abstract class MixinMonolithCodexPageFont {
             ),
             require = 0
     )
-    private static MutableComponent ancientRemnantsAdd$useCodexFont(
+    private MutableComponent ancientRemnantsAdd$useCodexFont(
             MutableComponent component, UnaryOperator<Style> upstreamStyle
     ) {
         return component.withStyle(style -> upstreamStyle.apply(style).withFont(AncientRemnantsAdd.id("codex")));

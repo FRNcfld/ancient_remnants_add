@@ -1,0 +1,33 @@
+{
+  "blessings": [
+    {
+      "blessing": "ancient_remnants:bountiful_harvest",
+      "max_stacks": 9
+    },
+    {
+      "blessing": "ancient_remnants:hunter_instincts",
+      "max_stacks": 9
+    },
+    {
+      "blessing": "ancient_remnants:architect_reach",
+      "max_stacks": 9
+    },
+    {
+      "blessing": "ancient_remnants:desperate_vitality",
+      "max_stacks": 9
+    },
+    {
+      "blessing": "ancient_remnants:warrior_wrath",
+      "max_stacks": 9
+    },
+    {
+      "blessing": "ancient_remnants:sentinel_aegis",
+      "max_stacks": 9
+    }
+  ],
+  "spread_dimensions": [
+    "minecraft:overworld",
+    "minecraft:the_nether",
+    "minecraft:the_end"
+  ]
+}

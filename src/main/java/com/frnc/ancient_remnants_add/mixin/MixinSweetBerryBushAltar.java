@@ -1,7 +1,7 @@
 package com.frnc.ancient_remnants_add.mixin;
 
+import com.frnc.ancient_remnants_add.altar.AltarBoostScope;
 import com.frnc.ancient_remnants_add.altar.AltarHarvestHelper;
-import com.frnc.ancient_remnants_add.altar.AltarSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * 甜浆果是原版里少数「右键收割而不是破坏方块」的作物。
- * 祭坛激活时，右键收获成熟甜浆果也按丰收概率额外掉一份。
+ * 在祭坛丰收生效范围内（与祭坛层级一致），右键收获成熟甜浆果也按丰收概率额外掉一份。
  */
 @Mixin(SweetBerryBushBlock.class)
 public abstract class MixinSweetBerryBushAltar {
@@ -45,7 +45,7 @@ public abstract class MixinSweetBerryBushAltar {
         // 不需要与「个人丰收祝福」去重：上游的丰收祝福只挂在 Block#playerDestroy 上
         // （见上游 ancient_remnants.mixins.json 的 MixinBlock），而右键收割走的是
         // SweetBerryBushBlock#use，不经过 getDrops/playerDestroy，所以不会重复掉落。
-        if (!AltarSavedData.get(serverLevel).isActive(serverLevel)) {
+        if (!AltarBoostScope.harvestEnabledAt(serverLevel, pos)) {
             return;
         }
         if (!AltarHarvestHelper.rollChance(serverLevel)) {

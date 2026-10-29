@@ -2,6 +2,7 @@ package com.frnc.ancient_remnants_add.blessing;
 
 import com.frnc.ancient_remnants_add.AncientRemnantsAdd;
 import com.frnc.ancient_remnants_add.Config;
+import com.frnc.ancient_remnants_add.altar.AltarBoostScope;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -65,7 +66,8 @@ public final class DesperateVitalityHandler {
             return;
         }
 
-        double absorption = player.getMaxHealth() * Config.desperateVitalityAbsorptionHealthPercentage();
+        double altar = AltarBoostScope.multiplierFor(player, BlessingIds.DESPERATE_VITALITY);
+        double absorption = player.getMaxHealth() * Config.desperateVitalityAbsorptionHealthPercentage() * altar;
         if (absorption <= 0.0D) {
             return;
         }
