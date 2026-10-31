@@ -48,6 +48,22 @@ description='''远古遗迹（Ancient Remnants）的附属模组，并与机械�
     ordering="NONE"
     side="BOTH"
 
+# Xaero's Minimap / Xaero's World Map：客户端模组（服务端可选），按 CLIENT 侧的软依赖声明。
+# modId 取自它们自己的注册命名空间（xaerominimap / xaeroworldmap）；没装不影响启动。
+[[dependencies.${mod_id}]]
+    modId="xaerominimap"
+    mandatory=false
+    versionRange="*"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.${mod_id}]]
+    modId="xaeroworldmap"
+    mandatory=false
+    versionRange="*"
+    ordering="NONE"
+    side="CLIENT"
+
 # 远古遗迹：另一个上游，本 mod 直接引用它的类（缺了会 NoClassDefFoundError），因此 mandatory=true。
 # 它自己硬依赖框架 Fragmentum，版本范围由它的 mods.toml 声明，这里不必重复。
 [[dependencies.${mod_id}]]

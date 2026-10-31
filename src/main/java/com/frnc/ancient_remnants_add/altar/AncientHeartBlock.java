@@ -1,5 +1,6 @@
 package com.frnc.ancient_remnants_add.altar;
 
+import com.frnc.ancient_remnants_add.waypoint.WaypointMarkerSync;
 import com.frnc.ancient_remnants_add.worldgen.AncientHeartRuinStructure;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -195,6 +196,8 @@ public class AncientHeartBlock extends BaseEntityBlock {
             if (!codex.isEmpty()) {
                 Block.popResource(serverLevel, rootPos, codex);
             }
+            // 小地图：祭坛不再激活，移除所有玩家数据里的祭坛标记（含离线玩家的持久数据）。
+            WaypointMarkerSync.altarExtinguished(serverLevel, rootPos);
         }
         for (Part part : Part.values()) {
             BlockPos cell = rootPos.offset(part.getDx(), 0, part.getDz());

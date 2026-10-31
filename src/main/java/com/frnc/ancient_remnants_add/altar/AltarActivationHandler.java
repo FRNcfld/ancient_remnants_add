@@ -1,6 +1,7 @@
 package com.frnc.ancient_remnants_add.altar;
 
 import com.frnc.ancient_remnants_add.AncientRemnantsAdd;
+import com.frnc.ancient_remnants_add.waypoint.WaypointMarkerSync;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -137,6 +138,8 @@ public final class AltarActivationHandler {
         if (!data.activate(root, stored)) {
             return;
         }
+        // 小地图：只有激活者本人看到祭坛标记；祭坛熄灭时会统一移除。
+        WaypointMarkerSync.altarActivated(player, level, root);
         if (!player.getAbilities().instabuild) {
             held.shrink(1);
         }

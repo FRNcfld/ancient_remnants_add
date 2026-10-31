@@ -1,8 +1,9 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "ancient_remnants_add:block/ancient_heart",
   "textures": {
-    "top": "minecraft:block/amethyst_block",
-    "side": "minecraft:block/deepslate_tiles",
-    "bottom": "minecraft:block/polished_deepslate"
+    "particle": "ancient_remnants_add:block/ancient_heart_side_active",
+    "top": "ancient_remnants_add:block/ancient_heart_top_active",
+    "side": "ancient_remnants_add:block/ancient_heart_side_active",
+    "bottom": "ancient_remnants_add:block/ancient_heart_bottom_active"
   }
 }

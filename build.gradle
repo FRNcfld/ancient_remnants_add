@@ -2,7 +2,10 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    // ForgeGradle 6.x 只发布在 maven.minecraftforge.net，该仓库在部分网络下非常慢。
+    // 用版本范围 [6.0,6.2) 时每次配置都要先拉 maven-metadata.xml，超时会让整个构建失败；
+    // 固定为本地缓存中已验证可用的 6.0.54，静态版本可直接命中缓存。
+    id 'net.minecraftforge.gradle' version '6.0.54'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     // MixinGradle：SpongePowered 官方 Gradle 插件。ForgeGradle 6 的 UserDevExtension
     // 移除了旧的 `mixin {}` 块，没有这个插件，mixin 配置在开发环境不会被注册，
@@ -163,6 +166,14 @@ dependencies {
     // 以后引用它的类必须做存在性隔离（见 README 约定），否则没装时会在类加载阶段失败。
     compileOnly fg.deobf("maven.modrinth:explorers-compass:${explorers_compass_version}")
     runtimeOnly fg.deobf("maven.modrinth:explorers-compass:${explorers_compass_version}")
+
+    // ---- 可选联动三 / 四：Xaero's Minimap、Xaero's World Map（小地图 / 世界地图）----
+    // 两者都是客户端模组（服务端可选），所以是 side=CLIENT 的软依赖：
+    // 编译期可见、开发环境运行时可用，不打包；玩家装了才会进入联动分支。
+    compileOnly fg.deobf("maven.modrinth:xaeros-minimap:${xaeros_minimap_version}")
+    runtimeOnly fg.deobf("maven.modrinth:xaeros-minimap:${xaeros_minimap_version}")
+    compileOnly fg.deobf("maven.modrinth:xaeros-world-map:${xaeros_world_map_version}")
+    runtimeOnly fg.deobf("maven.modrinth:xaeros-world-map:${xaeros_world_map_version}")
 
     // ---- 上游二：远古遗迹（Ancient Remnants）----
     // 代码需要直接引用它的类（本 mod 就是给它做扩展的），所以用 implementation。

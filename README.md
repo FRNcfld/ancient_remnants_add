@@ -2,13 +2,14 @@
 扩展模组
 
 面向 Minecraft **1.20.1 / Forge** 的 [远古遗迹（Ancient Remnants）](https://modrinth.com/mod/ancient-remnants)
-附属模组，[机械动力（Create）](https://modrinth.com/mod/create) 与
-[Explorer's Compass（结构指南针）](https://modrinth.com/mod/explorers-compass) 作为可选联动。
+附属模组，[机械动力（Create）](https://modrinth.com/mod/create)、
+[Explorer's Compass（结构指南针）](https://modrinth.com/mod/explorers-compass) 与
+[Xaero's Minimap / World Map](https://modrinth.com/mod/xaeros-minimap) 作为可选联动。
 
 > 当前状态：**已有玩法内容**。已实现多祝福、可配置的祝福数值、前哨站残片、
 > 2×2×1 远古之心、结构级祭坛仪式（修复/长按激活/守护/献祭）、祭坛层级祝福加成
 > 与机械概率扩散、残缺祭坛世界生成、「远古回响」「过往的幻影」「荣光再现」进度、
-> Create 概率产出联动，以及 Explorer's Compass 跳过已激活祭坛。
+> Create 概率产出联动、Explorer's Compass 跳过已激活祭坛，以及 Xaero 小地图标记。
 > 加内容时按下面的「约定」一节往下写即可。
 
 ## 当前功能
@@ -150,6 +151,21 @@ JEI 仍是可选前置；未安装 JEI 时插件类不会被加载，游戏与�
 - 版本以 `gradle.properties` 的 `explorers_compass_version`（1.20.1-1.4.0）为基准；
   注入使用 `require = 0`，上游改版导致注入点消失时退回原版搜索行为，不影响启动。
 
+### Xaero's Minimap / World Map 联动
+
+- 标记**仅本人可见**：服务端按玩家 UUID 保存在 `waypoint/WaypointMarkerData`（主世界 SavedData），
+  客户端只把这些标记写进 Xaero 的第三方路径点，不写玩家自己的持久路径点。
+- **已征服的遗迹**：玩家在远古遗迹内从 Elderheart（休眠核心）获得祝福时，在核心位置标一个
+  深紫色 `◈` 路径点。
+- **已激活的祭坛**：玩家自己激活残缺祭坛时，在祭坛站点标一个金色 `⛩` 路径点。
+- 两类标记通过 Xaero 第三方路径点显示，小地图与世界地图共用同一份数据。
+- 祭坛熄灭（破坏或献祭）会从所有玩家的标记数据中移除该祭坛；离线玩家下次登录时自动拿到
+  修正后的列表。
+- 第三方路径点不会被 Xaero 持久化，因此登录、换维度、重生或数据变化时由服务端重新下发完整快照。
+- Xaero 未安装时，客户端 tick 与包处理都会跳过；引用 Xaero 的类只在
+  `client/waypoint/XaeroWaypointApplier` 中，且由 `ModList.get().isLoaded("xaerominimap")` 隔离。
+- 当前使用字符符号作为「微缩休眠核心 / 祭坛截面」的占位图标；后续可替换成自定义字体字形。
+
 ## 环境要求
 
 | 项目 | 版本 |
@@ -160,6 +176,7 @@ JEI 仍是可选前置；未安装 JEI 时插件类不会被加载，游戏与�
 | 映射 | Parchment `2023.08.20-1.20.1`（叠加官方映射；联调 Create 6.0.x 时必须与它一致） |
 | Create（可选） | 6.0.8+；未安装也能启动 |
 | Explorer's Compass（可选联动） | 1.20.1-1.4.0（`explorerscompass`）；未安装也能启动 |
+| Xaero's Minimap / World Map（可选联动） | 小地图 26.6.0 / 世界地图 1.47.0（`xaerominimap` / `xaeroworldmap`）；未安装也能启动 |
 
 ## 依赖说明
 
@@ -171,6 +188,8 @@ JEI 仍是可选前置；未安装 JEI 时插件类不会被加载，游戏与�
 | Ancient Remnants（远古遗迹） | `maven.modrinth:ancient-remnants:r3G6hu9a`（= 1.5.2 / 1.20.1-forge） | `implementation` | 硬依赖，代码直接引用它的类 |
 | Fragmentum | `maven.modrinth:fragmentum:T7QOSm4k`（= 5.4.0 / 1.20.1-forge） | `compileOnly` + `runtimeOnly` | 远古遗迹的硬前置框架（它的 `mods.toml` 里 `mandatory=true`、`[5.2.0,)`）。上游类的公开签名里带有它的类型（如 `Deferred`），编译期需要可见；玩家环境由远古遗迹的 mandatory 依赖提供，不打包 |
 | Explorer's Compass（结构指南针，可选联动） | `maven.modrinth:explorers-compass:7ZdJbCOx`（= 1.20.1-1.4.0-forge） | `compileOnly` + `runtimeOnly`（仅开发环境） | `mods.toml` 里 `mandatory=false`，玩家没装也能启动；只用于编译期引用与开发环境联调，不打包 |
+| Xaero's Minimap（小地图，可选联动） | `maven.modrinth:xaeros-minimap:dB6E0CY9`（= forge-1.20.1-26.6.0） | `compileOnly` + `runtimeOnly`（仅开发环境） | 客户端模组（服务端可选），`mods.toml` 里 `mandatory=false`、`side="CLIENT"`；联动代码见「Xaero's Minimap / World Map 联动」 |
+| Xaero's World Map（世界地图，可选联动） | `maven.modrinth:xaeros-world-map:KtEupJvB`（= forge-1.20.1-1.47.0） | `compileOnly` + `runtimeOnly`（仅开发环境） | 同上；与小地图互相配合，未安装都不影响启动 |
 | JEI | `mezz.jei:jei-1.20.1-forge-api:15.56.0.205` | `compileOnly`（API）+ `runtimeOnly`（完整 jar） | 只是可选兼容，`mods.toml` 里 `mandatory=false`，不打包、不强制玩家安装 |
 
 **为什么用 Modrinth 的「版本 id」而不是版本号**：Modrinth 的 maven 里同一个版本号会对应多个
@@ -246,15 +265,17 @@ src/main/java/com/frnc/ancient_remnants_add/
 ├── Config.java               # 通用配置（config/ancient_remnants_add-common.toml）
 ├── altar/                    # 远古之心、站点 SavedData、长按激活、结构保护、献祭、层级加成、进度
 ├── blessing/                 # 多祝福列表、NBT 编解码、tick 同步与祝福数值后处理
-├── client/                   # 远古之心 BlockEntityRenderer（尖塔上方的休眠核心）
+├── client/                   # 远古之心渲染器与客户端小地图联动（client/waypoint/）
 ├── create/                   # Create 概率产出 +50% 的线程上下文
 ├── jei/                      # JEI 物品信息页（祭坛教程，可选）
 ├── loot/                     # 前哨站残片掉落接入
+├── network/                  # SimpleChannel：小地图标记快照（S2C）
+├── waypoint/                 # 按玩家保存的小地图标记（SavedData / 同步入口）
 ├── worldgen/                 # 残缺祭坛结构、afterPlace 站点登记、遗迹邻近放置、结构模板片段
 └── mixin/                    # 多祝福 / 上游 API / 祝福效果 / 祭坛 / 典籍字体；create/、explorerscompass/ 为可选联动，client/ 为客户端修复
 src/main/resources/
 ├── META-INF/mods.toml        # 模组元数据（modId / 版本 / 硬依赖与可选联动）
-├── assets/ancient_remnants_add/   # 远古之心模型、中英文 lang（含进度文本/风弹/旋风人译名）
+├── assets/ancient_remnants_add/   # 远古之心自建模型与贴图、中英文 lang（含进度文本/风弹/旋风人译名）
 ├── data/ancient_remnants_add/     # 战利品、古城注入、作物/献祭实体标签、三个进度、残缺祭坛结构与世界生成、altar_boost.json
 ├── pack.mcmeta               # 资源包描述
 └── ancient_remnants_add.mixins.json   # mixin 清单（11 个通用 + 9 个 Create 可选 + 1 个 Explorer's Compass 可选 + 1 个客户端）
@@ -282,6 +303,13 @@ src/main/resources/
   否则没装它的整合包会在类加载阶段 `NoClassDefFoundError`。Explorer's Compass 专用 mixin
   放在 `mixin/explorerscompass`，由 `AncientRemnantsAddMixinPlugin` 在它不存在时跳过；
   mixin 类本身只把上游类名写在 `@Mixin(targets = ...)` 字符串里，不直接引用上游类型。
+- **可选联动（Xaero's Minimap / World Map）**：同样是软依赖——`mods.toml` 里 `mandatory=false`、
+  `side="CLIENT"`，`build.gradle` 里 `compileOnly` + 仅开发环境的 `runtimeOnly`，不打包。
+  联动代码已实现：只有 `client/waypoint/XaeroWaypointApplier` 直接引用 Xaero，调用前用
+  `ModList.get().isLoaded("xaerominimap")` 判断；标记数据在 `waypoint/` 保存，快照由 `network/` 同步。
+  引用其类的新代码必须放在存在性判断分支或单独的类里，否则没装它的客户端会在类加载阶段
+  `NoClassDefFoundError`。官方更推荐用自己的 maven 拿 `dev` 产物（无需 deobf），坐标写在
+  `gradle.properties` 注释里。
 - **mixin**：MixinGradle 管线（含 refmap 与开发环境 `mixin.env.remapRefMap`）已接好。
   新增 mixin 类时把它登记进 `ancient_remnants_add.mixins.json` 的 `mixins`（通用）或 `client`（仅客户端）列表
   ——**漏登记的典型症状是「编译进 jar 但运行时不生效」**，不会报错。

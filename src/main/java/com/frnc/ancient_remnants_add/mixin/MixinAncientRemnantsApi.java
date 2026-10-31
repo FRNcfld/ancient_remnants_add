@@ -2,9 +2,11 @@ package com.frnc.ancient_remnants_add.mixin;
 
 import com.frnc.ancient_remnants_add.blessing.IMultiBlessingPlayer;
 import com.frnc.ancient_remnants_add.blessing.MultiBlessings;
+import com.frnc.ancient_remnants_add.waypoint.WaypointMarkerSync;
 import dev.obscuria.ancient_remnants.api.AncientRemnantsApi;
 import dev.obscuria.ancient_remnants.common.Blessing;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,6 +36,11 @@ public abstract class MixinAncientRemnantsApi {
     private void ancientRemnantsAdd$setBlessing(Player player, Holder<Blessing> blessing, CallbackInfo ci) {
         if (blessing == null) {
             return;
+        }
+        // 小地图：如果是遗迹里的 Elderheart 授予的祝福，记录该遗迹（仅本人可见）。
+        // 放在多祝福逻辑之前，避免接口缺失时漏掉地图标记；重复触发由数据层去重。
+        if (player instanceof ServerPlayer serverPlayer) {
+            WaypointMarkerSync.conquerRuinFromElderheart(serverPlayer, blessing);
         }
         if (!(player instanceof IMultiBlessingPlayer access)) {
             return;

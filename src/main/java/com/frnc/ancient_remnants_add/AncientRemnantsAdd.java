@@ -2,6 +2,7 @@ package com.frnc.ancient_remnants_add;
 
 import com.frnc.ancient_remnants_add.altar.AltarRegistry;
 import com.frnc.ancient_remnants_add.blessing.BlessingTuning;
+import com.frnc.ancient_remnants_add.network.ModNetwork;
 import com.frnc.ancient_remnants_add.worldgen.WorldgenRegistry;
 import com.mojang.logging.LogUtils;
 
@@ -19,8 +20,8 @@ import org.slf4j.Logger;
 /**
  * Ancient Remnants Add 主入口。
  *
- * <p>本 mod 是远古遗迹（Ancient Remnants）的附属模组，并把机械动力（Create）作为可选联动。
- * 当前已实现：
+ * <p>本 mod 是远古遗迹（Ancient Remnants）的附属模组，并把机械动力（Create）、
+ * Explorer's Compass 与 Xaero 小地图作为可选联动。当前已实现：
  * <ul>
  *   <li>多祝福：玩家可同时持有最多 {@code maxBlessings}（默认 6）个祝福，满额时替换最早获得的；</li>
  *   <li>祝福数值：六个祝福的伤害/距离/概率/阈值等数值都可在 {@code [blessings]} 配置段调整；</li>
@@ -29,7 +30,8 @@ import org.slf4j.Logger;
  *       放置完整典籍后把丰收祝福扩展到整个维度；</li>
  *   <li>残缺祭坛：远古遗迹周围 8–32 区块、每座遗迹 5% 概率生成；</li>
  *   <li>Create 联动：祭坛激活的维度内，Create 概率配方产出的 chance ×1.5（封顶 100%）；</li>
- *   <li>Explorer's Compass 联动：结构指南针搜索时跳过已激活的残缺祭坛。</li>
+ *   <li>Explorer's Compass 联动：结构指南针搜索时跳过已激活的残缺祭坛；</li>
+ *   <li>Xaero 小地图联动：按玩家记录已征服的遗迹与已激活的祭坛并显示为路径点。</li>
  * </ul>
  *
  * <p>后续加内容时的约定（与同仓库其它 1.20.1 工程一致）：
@@ -97,8 +99,12 @@ public class AncientRemnantsAdd {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        // 建筑师之触的属性修正器要在注册表就绪后用配置值刷新。
-        event.enqueueWork(BlessingTuning::applyArchitectReach);
+        event.enqueueWork(() -> {
+            // 小地图标记的服务端 → 客户端同步通道。
+            ModNetwork.register();
+            // 建筑师之触的属性修正器要在注册表就绪后用配置值刷新。
+            BlessingTuning.applyArchitectReach();
+        });
         LOGGER.info("[AncientRemnantsAdd] common setup done");
     }
 
